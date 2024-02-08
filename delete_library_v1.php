@@ -1,68 +1,34 @@
 <?php
-// Connect to the database
-// (Replace with your actual database connection logic)
+// Check if library ID is provided in the query string
+if (isset($_GET['library_id'])) {
+    // Retrieve library ID
+    $libraryId = $_GET['library_id'];
 
-// Retrieve library ID from the query string
-/*$libraryId = $_GET['id'];
+    // Connect to the database
+    $con = mysqli_connect('localhost', 'root', '', 'olms');
+    if (!$con) {
+        die("Database connection failed: " . mysqli_connect_error());
+    }
 
-// Prepare SQL query to delete library from the database
-$query = "DELETE FROM libraries WHERE id = :id";
-$stmt = $pdo->prepare($query);
-$stmt->bindParam(':id', $libraryId);
+    // Delete associated records from books_libraries table
+    $deleteBooksQuery = "DELETE FROM books_libraries WHERE library_id = '$libraryId'";
+    if (!mysqli_query($con, $deleteBooksQuery)) {
+        echo "Error deleting associated books from books_libraries table: " . mysqli_error($con);
+        exit;
+    }
 
-// Execute query and handle result
-if ($stmt->execute()) {
-  $success = 'Library deleted successfully!';
-  // Redirect to the libraries page
-  header('Location: my_libraries.php');
-  exit;
-} else {
-  $error = 'Error deleting library: ' . $stmt->errorInfo()[2];
-}*/
+    // Prepare and execute query to delete library from the database
+    $deleteLibraryQuery = "DELETE FROM libraries WHERE library_id = '$libraryId'";
+    if (mysqli_query($con, $deleteLibraryQuery)) {
+        // Redirect to the "My Libraries" page after deletion
+        header("Location: OLMS_my_library_v1.php");
+        exit;
+    } else {
+        // Handle database error
+        echo "Error deleting library: " . mysqli_error($con);
+    }
+
+    // Close database connection
+    mysqli_close($con);
+}
 ?>
-
-<!DOCTYPE html>
-<html>
-<head>
-<title>Delete Library | Online Literary Management System</title>
-<link rel="stylesheet" href="bootstrap-5.2.3-dist\css\bootstrap.css">
-<link rel="stylesheet" href="style_v1.css">
-</head>
-<body>
-
-<header>
-        <h1>Online Literary Management System</h1>
-        <nav>
-            <a href="OLMS_homepage_v1.html">Home</a>
-            <a href="OLMS_my_library_v1.php">My Libraries</a>
-            <a href="#">My Books</a>
-            <a href="#">Genres</a>
-            <a href="#">Tags</a>
-    </nav>
-</header><br>
-<main>
-  <h1>Delete Library</h1>
-
-  <?php/* if (isset($error)): ?>
-    <div class="alert alert-danger"><?php echo $error; ?></div>
-  <?php endif; ?>
-
-  <?php if (isset($success)): ?>
-    <div class="alert alert-success"><?php echo $success; ?></div>
-  <?php endif; */?>
-
-  <p>Are you sure you want to delete this library? This action cannot be undone.</p>
-
-  <a href="OLMS_my_library_v1.php" class="btn btn-secondary">Cancel</a>
-  <a href="delete_library_v1.php?id=<?php echo $libraryId; ?>&confirm=1" class="btn btn-danger">Delete Library</a><br><br>
-</main>
-<a href="OLMS_my_library_v1.php" class="btn btn-secondary">Back to My Libraries</a><br><br>
-<footer>
-        <div class="container">
-              <p>2024 Online Literary Management System Website</p>
-            </div>
-    </footer>
-
-
-</body>
-</html>

@@ -4,15 +4,32 @@
     <title>Online Literary Management System</title>
     <link rel="stylesheet" href="bootstrap-5.2.3-dist\css\bootstrap.css">
     <link rel="stylesheet" href="style_v1.css">
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const popupTriggers = document.querySelectorAll('.popup-trigger');
+    
+        popupTriggers.forEach(function(trigger) {
+            trigger.addEventListener('click', function() {
+                const popupTarget = this.getAttribute('data-trigger');
+                const popup = document.querySelector(`.popup[data-trigger="${popupTarget}"]`);
+                
+                if (popup) {
+                    popup.classList.toggle('show');
+                }
+            });
+        });
+    });
+</script>
 </head>
 <body class="bg-dark text-light">
 
     <header>
         <h1>Online Literary Management System</h1>
+        <div class="container">
         <nav>
             <a href="OLMS_homepage_v1.html">Home</a>
-            <a href="OLMS_my_library_v1.php" class="popup-trigger">My Libraries</a>
-        <div class="popup" data-trigger="My Libraries">
+            <a href="OLMS_my_library_v1.php" class="hover-trigger" data-popup="My Libraries">My Libraries</a>
+        <div class="popup" data-popup="My Libraries">
             <p>Create custom libraries to categorize your books, track reading progress, and share recommendations.</p>
         </div>
         <a href="#" class="popup-trigger">My Books</a>
@@ -27,9 +44,10 @@
         <div class="popup" data-trigger="Tags">
             <p>Create and assign tags to your books for personalized organization and recommendations.</p>
         </div>
-        <a href="OLMS_sign_in_v1.html">Sign In</a>
-        <a href="OLMS_create_account_v1.html">Create Account</a>
+        <a href="OLMS_sign_in_v2.php">Sign In</a>
+        <a href="OLMS_create_account_v2.php">Create Account</a>
     </nav>
+</div>
 </header>
     
         <div class="container">

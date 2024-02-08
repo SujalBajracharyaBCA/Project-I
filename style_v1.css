@@ -1,5 +1,5 @@
 .container {
-    width: 350px;
+    width: 500px;
     margin: 0 auto;
     text-align: center;
 }
@@ -22,7 +22,8 @@ label {
 }
 
 input[type="email"],
-input[type="password"] {
+input[type="password"],
+input[type="text"] {
     width: 100%;
     padding: 10px;
     border: 1px solid #ccc;
@@ -57,20 +58,20 @@ a,p,h2 {
 }
 .popup-container {
     position: relative;
-    display: inline-block; /* Ensure popups align correctly */
-  }
-  
-  .popup {
+}
+
+.popup {
+    display: none;
     position: absolute;
     top: 100%;
     left: 0;
-    background-color: #fff;
+    width: 200px;
     padding: 10px;
+    background-color: #fff;
     border: 1px solid #ccc;
-    display: none;
-  }
-  
-  .popup.active { /* Use a class to show the popup */
+    box-shadow: 0 2px 5px rgba(154, 84, 84, 0.2);
+}
+
+.hover-trigger:hover + .popup {
     display: block;
-  }
-  
+}

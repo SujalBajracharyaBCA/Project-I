@@ -20,28 +20,43 @@
   <table class="table table-striped">
     <thead>
       <tr>
+        <th><p>Library ID</p></th>
         <th><p>Name</p></th>
+        <th><p>Number of books</p></th>
         <th><p>Actions</p></th>
       </tr>
     </thead>
     <tbody>
       <?php
-      // Connect to the database and retrieve library data (replace with your actual code)
-      //$libraries = fetch_libraries_from_database();
-      //foreach ($libraries as $library) 
-      {
-        ?>
-        <tr>
-          <td><?//php echo $library['name']; ?></td>
-          <td>
-            <a href="view_library_v1.php?id=<?//php echo $library['id']; ?>">View</a>
-            <a href="edit_library_v1.php?id=<?//php echo $library['id']; ?>">Edit</a>
-            <a href="delete_library_v1.php?id=<?//php echo $library['id']; ?>" 
-            onclick="return confirm('Are you sure you want to delete this library?')">Delete</a>
-          </td>
-        </tr>
-        <?php
+      // Connect to the database using prepared statements
+      $con = mysqli_connect('localhost', 'root', '', 'olms');
+      if (!$con) {
+          die("Database connection failed: " . mysqli_connect_error());
       }
+
+      // Prepare and execute the query to fetch libraries
+      $stmt = mysqli_prepare($con, "SELECT library_id, lname, numofbooks FROM libraries");
+      mysqli_stmt_execute($stmt);
+      mysqli_stmt_bind_result($stmt, $library_id, $lname, $numofbooks);
+
+      // Fetch and display each library
+      while (mysqli_stmt_fetch($stmt)) {
+          ?>
+          <tr>
+              <td><p><?php echo $library_id; ?></p></td>
+              <td><p><?php echo $lname; ?></p></td>
+              <td><p><?php echo $numofbooks; ?></p></td>
+              <td>
+                  <a href="view_library_v1.php?library_id=<?php echo $library_id; ?>">View</a>
+                  <a href="edit_library_v1.php?library_id=<?php echo $library_id; ?>">Edit</a>
+                  <a href="delete_library_v1.php?library_id=<?php echo $library_id; ?>" onclick="return confirm('Are you sure you want to delete this library?')">Delete</a>
+              </td>
+          </tr>
+          <?php
+      }
+
+      mysqli_stmt_close($stmt);
+      mysqli_close($con);
       ?>
     </tbody>
   </table>
