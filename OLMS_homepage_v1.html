@@ -2,24 +2,8 @@
 <html>
 <head>
     <title>Online Literary Management System</title>
-    <link rel="stylesheet" href="bootstrap-5.2.3-dist\css\bootstrap.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="style_v1.css">
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const popupTriggers = document.querySelectorAll('.popup-trigger');
-    
-        popupTriggers.forEach(function(trigger) {
-            trigger.addEventListener('click', function() {
-                const popupTarget = this.getAttribute('data-trigger');
-                const popup = document.querySelector(`.popup[data-trigger="${popupTarget}"]`);
-                
-                if (popup) {
-                    popup.classList.toggle('show');
-                }
-            });
-        });
-    });
-</script>
 </head>
 <body class="bg-dark text-light">
 
@@ -28,23 +12,11 @@
         <div class="container">
         <nav>
             <a href="OLMS_homepage_v1.html">Home</a>
-            <a href="OLMS_my_library_v1.php" class="hover-trigger" data-popup="My Libraries">My Libraries</a>
-        <div class="popup" data-popup="My Libraries">
-            <p>Create custom libraries to categorize your books, track reading progress, and share recommendations.</p>
-        </div>
-        <a href="#" class="popup-trigger">My Books</a>
-        <div class="popup" data-trigger="My Books">
-            <p>Create profiles for your favorite webnovels and books, including titles, authors, summaries, genres, and tags.</p>
-        </div>
+            <a href="OLMS_my_library_v1.php">My Libraries</a>
+        <a href="#">My Books</a>
         <a href="#">Genres</a>
-        <div class="popup" data-trigger="Genres">
-            <p>Browse and manage genres to organize your library and discover new reads.</p>
-        </div>
         <a href="#">Tags</a>
-        <div class="popup" data-trigger="Tags">
-            <p>Create and assign tags to your books for personalized organization and recommendations.</p>
-        </div>
-        <a href="OLMS_sign_in_v2.php">Sign In</a>
+        <a href="OLMS_sign_in_v3.php">Sign In</a>
         <a href="OLMS_create_account_v2.php">Create Account</a>
     </nav>
 </div>

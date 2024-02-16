@@ -35,23 +35,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Execute query and handle result
         if (mysqli_stmt_execute($stmt)) {
             $success = "Account created successfully!";
-            header("Location: OLMS_homepage_v1.html");
+            header("Location: OLMS_owner_homepage_v1.php");
             exit; // Add exit to prevent further execution
         } else {
             $_SESSION['error'] = "Error creating account.";
         }
+        header("Location: OLMS_create_account_v2.php");
+        exit;
 
-        mysqli_stmt_close($stmt);
     }
 
+    mysqli_stmt_close($stmt);
     mysqli_close($con);
 }
-
+// Retrieve error message from session
+$error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
+unset($_SESSION['error']); // Clear the session error variable
 // Check for session error
-if (isset($_SESSION['error'])) {
-    $error = $_SESSION['error'];
-    unset($_SESSION['error']); // Clear session error
-}
+
 ?>
 
 
@@ -59,7 +60,7 @@ if (isset($_SESSION['error'])) {
 <html>
 <head>
     <title>Create Account - Online Literary Management System</title>
-    <link rel="stylesheet" href="bootstrap-5.2.3-dist\css\bootstrap.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="style_v1.css">
 </head>
 <body class="bg-dark text-light">
@@ -67,7 +68,7 @@ if (isset($_SESSION['error'])) {
         <header>
             <h1>Online Literary Management System</h1>
             <nav>
-                <a href="OLMS_homepage_v1.html">Home</a>
+                <a href="OLMS_owner_homepage_v1.php">Home</a>
             </nav>
         </header>
         <h2>Create Account</h2>
@@ -79,22 +80,23 @@ if (isset($_SESSION['error'])) {
         <?php endif; ?>
         <form method="post">
             <div class="form-group">
-                <label for="email">Email:</label>
+                <h2><label for="email">Email:</label></h2>
                 <input type="email" id="email" name="email" placeholder="Enter email" required>
             </div>
             <div class="form-group">
-                <label for="username">Username:</label>
+                <h2><label for="username">Username:</label></h2>
                 <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required>
             </div>
             <div class="form-group">
-                <label for="password">Password:</label>
+                <h2><label for="password">Password:</label></h2>
                 <input type="password" id="password" name="password" placeholder="Enter password" required>
             </div>
             <button type="submit">Create Account</button>
         </form>
         
         <p class="error-message"></p>
-        <p>Already have an account? <a href="OLMS_sign_in_v2.php">Sign in</a></p>
+        <p class="additional-links">
+        <p>Already have an account? <a href="OLMS_sign_in_v3.php">Sign in</a></p>
     </div>
     <footer>
         <p>2024 Online Literary Management System Website</p>
