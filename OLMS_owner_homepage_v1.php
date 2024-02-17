@@ -22,9 +22,9 @@ session_start(); // Start or resume the session
         <nav>
             <a href="OLMS_owner_homepage_v1.php">Home</a>
             <a href="OLMS_my_library_v1.php">My Libraries</a>
-            <a href="#">My Books</a>
-            <a href="OLMS_my_genre_v1.php">Genres</a>
-            <a href="#">Tags</a>
+            <a href="OLMS_my_book_v1.php">My Books</a>
+            <a href="OLMS_my_genre_v1.php">My Genres</a>
+            <a href="OLMS_my_tag_v1.php">My Tags</a>
             
             <div class="dropdown">
                 <button class="dropbtn"><?php echo $_SESSION['username'];

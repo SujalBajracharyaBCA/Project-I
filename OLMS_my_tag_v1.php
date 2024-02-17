@@ -16,18 +16,18 @@ if (isset($_SESSION['user_email'])) {
     exit;
 }
 
-// Prepare and execute the query to fetch genres associated with the user
-$stmt = mysqli_prepare($con, "SELECT genre_id, gname FROM genres WHERE owner_email = ?");
+// Prepare and execute the query to fetch tags associated with the user
+$stmt = mysqli_prepare($con, "SELECT tag_id, tname FROM tags WHERE owner_email = ?");
 mysqli_stmt_bind_param($stmt, "s", $user_email);
 mysqli_stmt_execute($stmt);
-mysqli_stmt_bind_result($stmt, $genre_id, $gname);
+mysqli_stmt_bind_result($stmt, $tag_id, $tname);
 
-// Initialize empty array to store genres
-$genres = [];
+// Initialize empty array to store tags
+$tags = [];
 
-// Fetch and store each genre in the array
+// Fetch and store each tag in the array
 while (mysqli_stmt_fetch($stmt)) {
-    $genres[] = array("genre_id" => $genre_id, "gname" => $gname);
+    $tags[] = array("tag_id" => $tag_id, "tname" => $tname);
 }
 
 mysqli_stmt_close($stmt);
@@ -38,19 +38,19 @@ mysqli_close($con);
 <!DOCTYPE html>
 <html>
 <head>
-    <title>My Genres | Online Literary Management System</title>
+    <title>My tags | Online Literary Management System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="style_v1.css">
 </head>
 <body class="bg-dark text-light">
     <header>
-    <h1>My Genre | Online Literary Management System</h1>
+    <h1>My tag | Online Literary Management System</h1>
         <nav>
             <a href="OLMS_owner_homepage_v1.php">Home</a>
             <a href="OLMS_my_library_v1.php">My Libraries</a>
             <a href="OLMS_my_book_v1.php">My Books</a>
             <a href="OLMS_my_genre_v1.php">My Genres</a>
-            <a href="OLMS_my_tag_v1.php">My Tags</a>
+             <a href="OLMS_my_tag_v1.php">My Tags</a>
             <div class="dropdown">
                 <button class="dropbtn">User: <?php echo $_SESSION['username'];
                 ?>
@@ -74,33 +74,33 @@ mysqli_close($con);
     </nav>
         </header><br>
 
-    <button type="button" class="btn btn-primary" onclick="window.location.href='create_genre_v1.php'">Create New Genre</button>
+    <button type="button" class="btn btn-primary" onclick="window.location.href='create_tag_v1.php'">Create New tag</button>
 
-    <?php if (!empty($genres)): ?>
+    <?php if (!empty($tags)): ?>
         <table class="table table-striped" width="100%">
             <thead>
                 <tr>
-                    <th><p>Genre serial no.</p></th>
-                    <th><p>Genre Name</p></th>
+                    <th><p>Tag serial no.</p></th>
+                    <th><p>Tag Name</p></th>
                     <th><p>Actions</p></th>
                 </tr>
             </thead>
             <tbody>
                 <?php $sno=1; ?>
-                <?php foreach ($genres as $genre): ?>
+                <?php foreach ($tags as $tag): ?>
                     <tr>
                         <td><p><?php echo $sno++; ?></p></td>
-                        <td><p><?php echo $genre["gname"]; ?></p></td>
+                        <td><p><?php echo $tag["tname"]; ?></p></td>
                         <td>
-                            <a href="edit_genre_v1.php?genre_id=<?php echo $genre["genre_id"]; ?>">Edit</a>
-                            <a href="delete_genre_v1.php?genre_id=<?php echo $genre["genre_id"]; ?>" onclick="return confirm('Are you sure you want to delete this genre?')">Delete</a>
+                            <a href="edit_tag_v1.php?tag_id=<?php echo $tag["tag_id"]; ?>">Edit</a>
+                            <a href="delete_tag_v1.php?tag_id=<?php echo $tag["tag_id"]; ?>" onclick="return confirm('Are you sure you want to delete this tag?')">Delete</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
     <?php else: ?>
-        <p>You haven't created any genres yet!</p>
+        <p>You haven't created any tags yet!</p>
     <?php endif; ?>
 
     <footer>

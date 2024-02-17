@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       echo "Error updating library: " . mysqli_error($con);
     } else {
       $success = 'Library updated successfully!';
-      header('Location: edit_library_v1.php?library_id=' . $libraryId);
+      header('Location: OLMS_my_library_v1.php');
       exit;
     }
   }
@@ -81,9 +81,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <nav>
             <a href="OLMS_owner_homepage_v1.php">Home</a>
             <a href="OLMS_my_library_v1.php">My Libraries</a>
-            <a href="#">My Books</a>
-            <a href="OLMS_my_genre_v1.php">Genres</a>
-            <a href="#">Tags</a>
+            <a href="OLMS_my_book_v1.php">My Books</a>
+            <a href="OLMS_my_genre_v1.php">My Genres</a>
+            <a href="OLMS_my_tag_v1.php">My Tags</a>
             <div class="dropdown">
                 <button class="dropbtn">User: <?php echo $_SESSION['username'];
                 ?>
@@ -123,7 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <br>
   <button type="submit" class="btn btn-primary">Update Library</button><br><br>
 </form>
-
+<br>
  
   <a href="OLMS_my_library_v1.php" class="btn btn-primary">Back to My Libraries</a><br><br>
 </main>

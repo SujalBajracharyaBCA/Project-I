@@ -9,7 +9,7 @@ if (!$con) {
     die("Database connection failed: " . mysqli_connect_error());
 }
 
-// Check if the user is logged in (assuming a genre belongs to a user)
+// Check if the user is logged in (assuming a tag belongs to a user)
 if (isset($_SESSION['user_email'])) {
     $user_email = $_SESSION['user_email'];
     // Fetch user information from the database
@@ -26,24 +26,24 @@ if (isset($_SESSION['user_email'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $gname = $_POST['gname'];
+    $tname = $_POST['tname'];
 
-    // Validate genre name (optional)
+    // Validate tag name (optional)
     // You can add checks for length, allowed characters, or uniqueness here
 
     // Prepare SQL query using prepared statements
-    $stmt = mysqli_prepare($con, "INSERT INTO genres (genre_id, gname, owner_email) VALUES (NULL, ?, ?)");
-    mysqli_stmt_bind_param($stmt, "ss", $gname, $user_email);
+    $stmt = mysqli_prepare($con, "INSERT INTO tags (tag_id, tname, owner_email) VALUES (NULL, ?, ?)");
+    mysqli_stmt_bind_param($stmt, "ss", $tname, $user_email);
 
     // Execute query and handle result
     if (mysqli_stmt_execute($stmt)) {
-        $success = '<p>Genre created successfully!</p>';
+        $success = '<p>tag created successfully!</p>';
     } else {
-        $error = '<p>Error creating genre: ' . mysqli_error($con).'</p>';
+        $error = '<p>Error creating tag: ' . mysqli_error($con).'</p>';
     }
 
     mysqli_stmt_close($stmt);
-    header("Location: create_genre_v1.php"); // Refresh the page
+    header("Location: create_tag_v1.php"); // Refresh the page
 }
 
 mysqli_close($con);
@@ -52,7 +52,7 @@ mysqli_close($con);
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Create Genre | Online Literary Management System</title>
+    <title>Create tag | Online Literary Management System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="style_v1.css">
 </head>
@@ -60,7 +60,7 @@ mysqli_close($con);
 
 <main>
 <header>
-<h1>Create Genre | Genres | Online Literary Management System</h1>
+<h1>Create tag | tags | Online Literary Management System</h1>
     <nav>
         <a href="OLMS_owner_homepage_v1.php">Home</a>
         <a href="OLMS_my_library_v1.php">My Libraries</a>
@@ -95,12 +95,12 @@ mysqli_close($con);
 
 <form method="post">
     <div class="container">
-        <label for="name" class="form-label"><p>Genre Name:</p></label>
-        <input type="text" class="form-control" placeholder="Enter genre name" id="gname" name="gname" required><br>
+        <label for="name" class="form-label"><p>Tag Name:</p></label>
+        <input type="text" class="form-control" placeholder="Enter tag name" id="tname" name="tname" required><br>
     </div><br>
-    <button type="submit" class="btn btn-primary">Create Genre</button><br>
+    <button type="submit" class="btn btn-primary">Create Tag</button><br>
 </form><br>
-<a href="OLMS_my_genre_v1.php" class="btn btn-primary">Back to My Genre</a><br><br>
+<a href="OLMS_my_tag_v1.php" class="btn btn-primary">Back to My Tags</a><br><br>
 <footer>
     <div class="container">
         <p>2024 Online Literary Management System Website</p>

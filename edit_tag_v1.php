@@ -16,40 +16,40 @@ if (isset($_SESSION['user_email'])) {
     exit;
 }
 
-// Retrieve genre ID
-$genreId = $_GET['genre_id'];
+// Retrieve tag ID
+$tagId = $_GET['tag_id'];
 
-// Retrieve genre details from the database
-$stmt = mysqli_prepare($con, "SELECT genre_id, gname FROM genres WHERE genre_id = ? AND owner_email = ?");
-mysqli_stmt_bind_param($stmt, "is", $genreId, $user_email);
+// Retrieve tag details from the database
+$stmt = mysqli_prepare($con, "SELECT tag_id, tname FROM tags WHERE tag_id = ? AND owner_email = ?");
+mysqli_stmt_bind_param($stmt, "is", $tagId, $user_email);
 
 if (!mysqli_stmt_execute($stmt)) {
     echo "Error preparing statement: " . mysqli_error($con);
 } else {
-    mysqli_stmt_bind_result($stmt, $genre_id, $gname);
+    mysqli_stmt_bind_result($stmt, $tag_id, $tname);
     mysqli_stmt_fetch($stmt);
     mysqli_stmt_close($stmt);
 }
 
-if (!$genreId) {
-    $error = 'Genre not found.';
+if (!$tagId) {
+    $error = 'tag not found.';
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Process genre editing request
+    // Process tag editing request
 
     // Validate user input (replace with your validation logic)
-    if (empty($_POST['gname'])) {
-        $error = 'Please enter a name for the genre.';
+    if (empty($_POST['tname'])) {
+        $error = 'Please enter a name for the tag.';
     } else {
-        $stmt = mysqli_prepare($con, "UPDATE genres SET gname = ? WHERE genre_id = ?");
-        mysqli_stmt_bind_param($stmt, "si", $_POST['gname'], $genreId);
+        $stmt = mysqli_prepare($con, "UPDATE tags SET tname = ? WHERE tag_id = ?");
+        mysqli_stmt_bind_param($stmt, "si", $_POST['tname'], $tagId);
 
         if (!mysqli_stmt_execute($stmt)) {
-            echo "Error updating genre: " . mysqli_error($con);
+            echo "Error updating tag: " . mysqli_error($con);
         } else {
-            $success = 'Genre updated successfully!';
-            header('Location: OLMS_my_genre_v1.php');
+            $success = 'tag updated successfully!';
+            header('Location: OLMS_my_tag_v1.php');
             exit;
         }
     }
@@ -59,14 +59,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html>
 <head>
-<title>Edit Genre | My Genres | Online Literary Management System</title>
+<title>Edit tag | My tags | Online Literary Management System</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="style_v1.css">
 </head>
 <body>
     <main>
     <header>
-        <h1> Edit Genre | My Genre | Online Literary Management System</h1>
+        <h1> Edit tag | My tag | Online Literary Management System</h1>
            <nav>
             <a href="OLMS_owner_homepage_v1.php">Home</a>
             <a href="OLMS_my_library_v1.php">My Libraries</a>
@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
     </nav>
     </header><br>
-    <h1>Edit Genre</h1>
+    <h1>Edit tag</h1>
 <?php if (isset($error)): ?>
     <div class="alert alert-danger"><?php echo $error; ?></div>
 <?php endif; ?>
@@ -104,14 +104,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <form method="post">
 <div class="container">
-    <label for="gname" class="form-label"><p>Genre Name</p></label>
-    <input type="text" class="form-control" id="gname" name="gname" placeholder="Genre Name" value="<?php echo $gname; ?>" required>
+    <label for="tname" class="form-label"><p>Tag Name</p></label>
+    <input type="text" class="form-control" id="tname" name="tname" placeholder="tag Name" value="<?php echo $tname; ?>" required>
 </div>
 <br>
-    <button type="submit" class="btn btn-primary">Update Genre</button><br><br>
+    <button type="submit" class="btn btn-primary">Update Tag</button><br><br>
 </form>
 <br>
-<a href="OLMS_my_genre_v1.php" class="btn btn-primary">Back to My Genres</a><br><br>
+<a href="OLMS_my_tag_v1.php" class="btn btn-primary">Back to My Tags</a><br><br>
 </main>
 <footer>
         <div class="container">
