@@ -1,21 +1,29 @@
 <?php
 session_start();
+$error = '';
+$success = '';
 
-// Check if the user is logged in
-if (isset($_SESSION['user_email'])) {
-    // Connect to the database using prepared statements
-    $con = mysqli_connect('localhost', 'root', '', 'olms');
-    if (!$con) {
-        die("Database connection failed: " . mysqli_connect_error());
-    }
-
-    $user_email = $_SESSION['user_email'];
-} else {
-    // Redirect user to sign-in page if not logged in
-    header("Location: OLMS_sign_in_v3.php");
-    exit;
+// Connect to the database
+$con = mysqli_connect('localhost', 'root', '', 'olms');
+if (!$con) {
+    die("Database connection failed: " . mysqli_connect_error());
 }
 
+// Check if the user is logged in 
+if (isset($_SESSION['user_email'])) {
+    $user_email = $_SESSION['user_email'];
+    // Fetch user information from the database
+    $sql = "SELECT username FROM users WHERE email = ?";
+    $stmt = mysqli_prepare($con, $sql);
+    mysqli_stmt_bind_param($stmt, "s", $user_email);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_bind_result($stmt, $username);
+    mysqli_stmt_fetch($stmt);
+    mysqli_stmt_close($stmt);
+} else {
+    header("Location: OLMS_sign_in_v3.php"); // Redirect to login if not logged in
+    exit;
+}
 // Prepare and execute the query to fetch tags associated with the user
 $stmt = mysqli_prepare($con, "SELECT tag_id, tname FROM tags WHERE owner_email = ?");
 mysqli_stmt_bind_param($stmt, "s", $user_email);
@@ -44,34 +52,30 @@ mysqli_close($con);
 </head>
 <body class="bg-dark text-light">
     <header>
-    <h1>My tag | Online Literary Management System</h1>
-        <nav>
-            <a href="OLMS_owner_homepage_v1.php">Home</a>
-            <a href="OLMS_my_library_v1.php">My Libraries</a>
-            <a href="OLMS_my_book_v1.php">My Books</a>
-            <a href="OLMS_my_genre_v1.php">My Genres</a>
-             <a href="OLMS_my_tag_v1.php">My Tags</a>
+    <h1>My Tag | Online Literary Management System</h1>
+    <div class="topnav">
+        
+        <a href="OLMS_owner_homepage_v1.php"><i class="fa fa-fw fa-home"></i>Home</a>
+        <a href="OLMS_my_library_v1.php">My Libraries</a>
+        <a href="OLMS_my_book_v1.php">My Books</a>
+        <a href="OLMS_my_genre_v1.php">My Genres</a>
+        <a class="active" href="OLMS_my_tag_v1.php">My Tags</a>
+        <?php if ($username) : ?>
             <div class="dropdown">
-                <button class="dropbtn">User: <?php echo $_SESSION['username'];
-                ?>
+                <button class="dropbtn"><i class="fa fa-user-circle menu"></i>
                     <i class="fa fa-caret-down"></i>
                 </button>
                 <div class="dropdown-content">
-                    <?php
-                    if (isset($_SESSION['user_email'])) {
-                        // User is logged in, display username, email, and logout option
-                        echo '<a href="#">' . $_SESSION['username'] . '</a>';
-                        echo '<a href="#">' . $_SESSION['user_email'] . '</a>';
-                        echo '<a href="log_out_v1.php">Log Out</a>';
-                    } else {
-                        // User is not logged in, display Sign In and Create Account links
-                        echo '<a href="OLMS_sign_in_v3.php">Sign In</a>';
-                        echo '<a href="OLMS_create_account_v2.php">Create Account</a>';
-                    }
-                    ?>
+                    <a href="#"><?php echo "Username:".$username; ?></a>
+                    <a href="#"><?php echo "Email:".$user_email; ?></a>
+                    <a href="log_out_v1.php"><i class="fa-solid fa-fw fa-right-from-bracket mr4"></i>Log Out</a>
                 </div>
             </div>
-    </nav>
+        <?php else : ?>
+            <a href="OLMS_sign_in_v3.php">Sign In</a>
+            <a href="OLMS_create_account_v2.php">Create Account</a>
+        <?php endif; ?>
+    </div>
         </header><br>
 
     <button type="button" class="btn btn-primary" onclick="window.location.href='create_tag_v1.php'">Create New tag</button>
@@ -86,14 +90,14 @@ mysqli_close($con);
                 </tr>
             </thead>
             <tbody>
-                <?php $sno=1; ?>
-                <?php foreach ($tags as $tag): ?>
+                <?php $sno=1;
+                 foreach ($tags as $tag): ?>
                     <tr>
                         <td><p><?php echo $sno++; ?></p></td>
                         <td><p><?php echo $tag["tname"]; ?></p></td>
                         <td>
                             <a href="edit_tag_v1.php?tag_id=<?php echo $tag["tag_id"]; ?>">Edit</a>
-                            <a href="delete_tag_v1.php?tag_id=<?php echo $tag["tag_id"]; ?>" onclick="return confirm('Are you sure you want to delete this tag?')">Delete</a>
+                            <a href="delete_tag_v1.php?tag_id=<?php echo $tag["tag_id"]; ?>" onclick="return confirm('Are you sure you want to delete this tag?')"><i class="fa fa-trash"></i></a>
                         </td>
                     </tr>
                 <?php endforeach; ?>

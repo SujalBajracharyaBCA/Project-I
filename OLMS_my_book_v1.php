@@ -1,14 +1,26 @@
 <?php
-// ... existing code for session checking and starting header
+
 session_start();
+$con = mysqli_connect('localhost', 'root', '', 'olms');
+if (!$con) {
+    die("Database connection failed: " . mysqli_connect_error());
+}
+
+// Check if the user is logged in 
 if (isset($_SESSION['user_email'])) {
     $user_email = $_SESSION['user_email'];
-
-    // Connect to the database using prepared statements
-    $con = mysqli_connect('localhost', 'root', '', 'olms');
-    if (!$con) {
-        die("Database connection failed: " . mysqli_connect_error());
-    }
+    // Fetch user information from the database
+    $sql = "SELECT username FROM users WHERE email = ?";
+    $stmt = mysqli_prepare($con, $sql);
+    mysqli_stmt_bind_param($stmt, "s", $user_email);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_bind_result($stmt, $username);
+    mysqli_stmt_fetch($stmt);
+    mysqli_stmt_close($stmt);
+} else {
+    header("Location: OLMS_sign_in_v3.php"); // Redirect to login if not logged in
+    exit;
+}
 // Query to fetch all books associated with the user
 $bookQuery = "SELECT DISTINCT b.book_id, b.bname, GROUP_CONCAT(DISTINCT a.aname SEPARATOR ', ') AS authors,
                 GROUP_CONCAT(DISTINCT g.gname SEPARATOR ', ') AS genres,
@@ -33,11 +45,7 @@ if (!mysqli_stmt_execute($bookStmt)) {
 $bookResult = mysqli_stmt_get_result($bookStmt);
 
     
-} else {
-    // Redirect user to sign-in page if not logged in
-    header("Location: OLMS_sign_in_v3.php");
-    exit;
-}
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -49,33 +57,29 @@ $bookResult = mysqli_stmt_get_result($bookStmt);
 <body class="bg-dark text-light">
   <header>
         <h1>My Books | Online Literary Management System</h1>
-        <nav>
-            <a href="OLMS_owner_homepage_v1.php">Home</a>
-            <a href="OLMS_my_library_v1.php">My Libraries</a>
-            <a href="OLMS_my_book_v1.php">My Books</a>
-            <a href="OLMS_my_genre_v1.php">My Genres</a>
-            <a href="OLMS_my_tag_v1.php">My Tags</a>
+        <div class="topnav">
+        
+        <a href="OLMS_owner_homepage_v1.php"><i class="fa fa-fw fa-home"></i>Home</a>
+        <a href="OLMS_my_library_v1.php">My Libraries</a>
+        <a class="active" href="OLMS_my_book_v1.php">My Books</a>
+        <a href="OLMS_my_genre_v1.php">My Genres</a>
+        <a href="OLMS_my_tag_v1.php">My Tags</a>
+        <?php if ($username) : ?>
             <div class="dropdown">
-                <button class="dropbtn">User: <?php echo $_SESSION['username'];
-                ?>
+                <button class="dropbtn"><i class="fa fa-user-circle menu"></i>
                     <i class="fa fa-caret-down"></i>
                 </button>
                 <div class="dropdown-content">
-                    <?php
-                    if (isset($_SESSION['user_email'])) {
-                        // User is logged in, display username, email, and logout option
-                        echo '<a href="#">' . $_SESSION['username'] . '</a>';
-                        echo '<a href="#">' . $_SESSION['user_email'] . '</a>';
-                        echo '<a href="log_out_v1.php">Log Out</a>';
-                    } else {
-                        // User is not logged in, display Sign In and Create Account links
-                        echo '<a href="OLMS_sign_in_v3.php">Sign In</a>';
-                        echo '<a href="OLMS_create_account_v2.php">Create Account</a>';
-                    }
-                    ?>
+                    <a href="#"><?php echo "Username:".$username; ?></a>
+                    <a href="#"><?php echo "Email:".$user_email; ?></a>
+                    <a href="log_out_v1.php"><i class="fa-solid fa-fw fa-right-from-bracket mr4"></i>Log Out</a>
                 </div>
             </div>
-    </nav>
+        <?php else : ?>
+            <a href="OLMS_sign_in_v3.php">Sign In</a>
+            <a href="OLMS_create_account_v2.php">Create Account</a>
+        <?php endif; ?>
+    </div>
 </header><br>
 <button type="button" class="btn btn-primary" onclick="window.location.href='create_book_v2.php'">Create New Book Profile</button><br>
 

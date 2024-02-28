@@ -1,20 +1,28 @@
 <?php
       session_start();
       // Check if the user is logged in
-      if (isset($_SESSION['user_email'])) {
+     
           // Connect to the database using prepared statements
           $con = mysqli_connect('localhost', 'root', '', 'olms');
           if (!$con) {
               die("Database connection failed: " . mysqli_connect_error());
           }
           
-          $user_email = $_SESSION['user_email'];
-
-      } else {
-          // Redirect user to sign-in page if not logged in
-          header("Location: OLMS_sign_in_v3.php");
-          exit;
-      }
+          // Check if the user is logged in 
+          if (isset($_SESSION['user_email'])) {
+              $user_email = $_SESSION['user_email'];
+              // Fetch user information from the database
+              $sql = "SELECT username FROM users WHERE email = ?";
+              $stmt = mysqli_prepare($con, $sql);
+              mysqli_stmt_bind_param($stmt, "s", $user_email);
+              mysqli_stmt_execute($stmt);
+              mysqli_stmt_bind_result($stmt, $username);
+              mysqli_stmt_fetch($stmt);
+              mysqli_stmt_close($stmt);
+          } else {
+              header("Location: OLMS_sign_in_v3.php"); // Redirect to login if not logged in
+              exit;
+          }
       ?>
 <!DOCTYPE html>
 <html>
@@ -26,36 +34,32 @@
 <body class="bg-dark text-light">
   <header>
         <h1>My Libraries | Online Literary Management System</h1>
-        <nav>
-            <a href="OLMS_owner_homepage_v1.php">Home</a>
-            <a href="OLMS_my_library_v1.php">My Libraries</a>
-            <a href="OLMS_my_book_v1.php">My Books</a>
-            <a href="OLMS_my_genre_v1.php">My Genres</a>
-            <a href="OLMS_my_tag_v1.php">My Tags</a>
+        <div class="topnav">
+        
+        <a href="OLMS_owner_homepage_v1.php"><i class="fa fa-fw fa-home"></i>Home</a>
+        <a class="active" href="OLMS_my_library_v1.php">My Libraries</a>
+        <a href="OLMS_my_book_v1.php">My Books</a>
+        <a href="OLMS_my_genre_v1.php">My Genres</a>
+        <a href="OLMS_my_tag_v1.php">My Tags</a>
+        <?php if ($username) : ?>
             <div class="dropdown">
-                <button class="dropbtn">User: <?php echo $_SESSION['username'];
-                ?>
+                <button class="dropbtn"><i class="fa fa-user-circle menu"></i>
                     <i class="fa fa-caret-down"></i>
                 </button>
                 <div class="dropdown-content">
-                    <?php
-                    if (isset($_SESSION['user_email'])) {
-                        // User is logged in, display username, email, and logout option
-                        echo '<a href="#">' . $_SESSION['username'] . '</a>';
-                        echo '<a href="#">' . $_SESSION['user_email'] . '</a>';
-                        echo '<a href="log_out_v1.php">Log Out</a>';
-                    } else {
-                        // User is not logged in, display Sign In and Create Account links
-                        echo '<a href="OLMS_sign_in_v3.php">Sign In</a>';
-                        echo '<a href="OLMS_create_account_v2.php">Create Account</a>';
-                    }
-                    ?>
+                    <a href="#"><?php echo "Username:".$username; ?></a>
+                    <a href="#"><?php echo "Email:".$user_email; ?></a>
+                    <a href="log_out_v1.php"><i class="fa-solid fa-fw fa-right-from-bracket mr4"></i>Log Out</a>
                 </div>
             </div>
-    </nav>
+        <?php else : ?>
+            <a href="OLMS_sign_in_v3.php">Sign In</a>
+            <a href="OLMS_create_account_v2.php">Create Account</a>
+        <?php endif; ?>
+    </div>
 </header><br>
-  <button type="button" class="btn btn-primary" onclick="window.location.href='create_library_v1.php'">Create New Library</button>
-  <table class="table table-striped" width="100%">
+  <button type="button" class="btn btn-primary" onclick="window.location.href='create_library_v1.php'">Create New Library</button><br>
+  <table class="table table-striped">
     <thead>
       <tr>
         <th><p>Library serial no.</p></th>
@@ -74,24 +78,23 @@
           mysqli_stmt_bind_result($stmt, $library_id, $lname, $numofbooks);
             
           // Fetch and display each library
-          while (mysqli_stmt_fetch($stmt)) {
-              ?>
+          while (mysqli_stmt_fetch($stmt)) {?>
               <tr>
-                  <td><p><?php echo $sno++; ?></p></td>
+                  <td><p><?php echo $sno; ?></p></td>
                   <td><p><a href="view_library_v1.php?library_id=<?php echo $library_id; ?>"><?php echo $lname; ?></a></p></td>
                   <td><p><?php echo $numofbooks; ?></p></td>
                   <td>
                       <a href="view_library_v1.php?library_id=<?php echo $library_id; ?>">View</a>
                       <a href="edit_library_v1.php?library_id=<?php echo $library_id; ?>">Edit</a>
-                      <a href="delete_library_v1.php?library_id=<?php echo $library_id; ?>" onclick="return confirm('Are you sure you want to delete this library?')">Delete</a>
+                      <a href="delete_library_v1.php?library_id=<?php echo $library_id; ?>" onclick="return confirm('Are you sure you want to delete this library?')"><i class="fa fa-trash"></i></a>
                   </td>
               </tr>
               <?php
-          
+          $sno++;
           }?>
     </tbody>
   </table>
-  <?
+  <?php
   mysqli_stmt_close($stmt);
   mysqli_close($con);
   ?>

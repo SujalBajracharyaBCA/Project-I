@@ -60,7 +60,7 @@ if ($library_id) {
 <head>
     <title>My Libraries | Online Literary Management System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="style_v1.css">
+    <link rel="stylesheet" href="style_v2.css">
 </head>
 <body class="bg-dark text-light">
     <header>
@@ -83,19 +83,22 @@ if ($library_id) {
             </div>
         </nav>
     </header><br>
-
+    <h2>All Books</h2>
+<table class='table table-striped' width='100%'>
+<thead>
+<tr>
+<th><p>Book serial no.</p></th>
+<th><p>Book Title</p></th>
+<th><p>Authors</p></th>
+<th><p>Genres</p></th>
+<th><p>Tags</p></th>
+</tr>
+</thead>
+<tbody>
     <?php
     $sno=1;
     if (mysqli_num_rows($bookResult) > 0) {
-        echo "<h2>All Books</h2>";
-echo "<table class='table table-striped' width='100%'>";
-echo "<thead><tr><th><p>Book serial no.</p></th>";
-echo "<th><p>Book Title</p></th>";
-echo "<th><p>Authors</p></th>";
-echo "<th><p>Genres</p></th>";
-echo "<th><p>Tags</p></th></tr></thead>";
-echo "<tbody>";
-        echo "<div class='row row-cols-1 row-cols-md-3 g-4' width='100%'>";
+    
         while ($bookRow = mysqli_fetch_assoc($bookResult)) {
             $bookId = $bookRow['book_id'];
             $bookName = $bookRow['bname'];

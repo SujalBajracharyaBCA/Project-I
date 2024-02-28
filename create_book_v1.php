@@ -18,20 +18,43 @@ if (!isset($_SESSION['user_email'])) {
 }
 $user_email = $_SESSION['user_email'];
 $username = $_SESSION['username'];
-// ... existing code (including error/success handling and database connection)
+
+// Function to fetch genres from the database
+function fetchGenresFromDatabase($con, $useremail) {
+    // Perform query to fetch genres from the database
+    $con = mysqli_connect('localhost', 'root', '', 'olms');
+    $sql = "SELECT genre_id, gname FROM genres WHERE owner_email='$useremail'";
+    $result = mysqli_query($con, $sql);
+
+    // Fetch genres as associative array
+    $genres = [];
+    while ($row = mysqli_fetch_assoc($result)) {
+        $genres[] = $row;
+    }
+
+    return $genres;
+    
+}
+
+// Function to fetch tags from the database
+function fetchTagsFromDatabase($con, $useremail) {
+    // Perform query to fetch tags from the database
+    $con = mysqli_connect('localhost', 'root', '', 'olms');
+    $sql = "SELECT tag_id, tname FROM tags WHERE owner_email='$useremail'";
+    $result = mysqli_query($con, $sql);
+
+    // Fetch tags as associative array
+    $tags = [];
+    while ($row = mysqli_fetch_assoc($result)) {
+        $tags[] = $row;
+    }
+
+    return $tags;
+   
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // ... existing validation and sanitization
-
-    $bname = filter_input(INPUT_POST, 'bname');
-    $author = filter_input(INPUT_POST, 'author');
-    $genres = filter_input(INPUT_POST, 'genres', FILTER_REQUIRE_ARRAY); // Enforce genre selection
-    $tags = filter_input(INPUT_POST, 'tags', FILTER_REQUIRE_ARRAY); // Enforce tag selection
-    $numofchaprd = filter_input(INPUT_POST, 'numofchaprd', FILTER_SANITIZE_NUMBER_INT);
-    $numofchaptl = filter_input(INPUT_POST, 'numofchaptl', FILTER_SANITIZE_NUMBER_INT);
-    $synopsis = filter_input(INPUT_POST, 'synopsis');
-    $external_url = filter_input(INPUT_POST, 'external_url', FILTER_SANITIZE_URL); // Validate and sanitize URL
-
    
     // Check if author exists, insert if not
     $sql = "SELECT author_id FROM authors WHERE aname = ?";
@@ -50,51 +73,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $author_id = mysqli_insert_id($con);
     }
     mysqli_stmt_close($stmt);
+
     if (empty($bname) || empty($author) || empty($genres) || empty($tags)) {
         $error = '<p>Please fill in all required fields.</p>';
     } else {
-    // Prepare and execute SQL query for book creation
-    $stmt = mysqli_prepare($con, "INSERT INTO books (book_id, bname, owner_email, author_id, numofchaprd, numofchaptl, synopsis) VALUES (NULL, ?, ?, ?, ?, ?, ?)");
-    mysqli_stmt_bind_param($stmt, "ssssssi", $bname, $_SESSION['user_email'], $author_id, $numofchaprd, $numofchaptl, $synopsis);
-    if (mysqli_stmt_execute($stmt)) {
-        $bookId = mysqli_insert_id($con); // Get the newly inserted book ID
-
-    
-        // Insert external URL into separate table
-        $stmt = mysqli_prepare($con, "INSERT INTO books_url (url, book_id, owner_email) VALUES (?, ?, ?)");
-        mysqli_stmt_bind_param($stmt, "sss", $external_url, $bookId, $_SESSION['user_email']);
+        // Prepare and execute SQL query for book creation
+        $stmt = mysqli_prepare($con, "INSERT INTO books (book_id, bname, owner_email, numofchaprd, numofchaptl, synopsis) VALUES (NULL, ?, ?, ?, ?, ?, ?)");
+        mysqli_stmt_bind_param($stmt, "ssiis", $bname, $user_email, $numofchaprd, $numofchaptl, $synopsis);
         if (mysqli_stmt_execute($stmt)) {
-            // ... (handle success)
+            $bookId = mysqli_insert_id($con); // Get the newly inserted book ID
+
+            // Insert external URL into separate table
+            $stmt = mysqli_prepare($con, "INSERT INTO books_url (url, book_id, owner_email) VALUES (?, ?, ?)");
+            mysqli_stmt_bind_param($stmt, "sss", $external_url, $bookId, $_SESSION['user_email']);
+            if (mysqli_stmt_execute($stmt)) {
+                // ... (handle success)
+                $success = '<p>Book created successfully! View your book <a href="OLMS_book_details_v1.php?book_id=' . $bookId . '">here</a>.</p>';
+            } else {
+                // ... (handle error)
+                $error = '<p>Error creating book: ' . mysqli_error($con) . '</p>';
+            }
+            mysqli_stmt_close($stmt);
+
+            // Now you have the $bookId, you can associate genres and tags with the book
+
+            // Handle genre and tag associations here
+
             $success = '<p>Book created successfully! View your book <a href="OLMS_book_details_v1.php?book_id=' . $bookId . '">here</a>.</p>';
-       
         } else {
-            // ... (handle error)
-            $error = '<p>Error creating book: ' . mysqli_error($con).'</p>';
-       
+            $error = '<p>Error creating book: ' . mysqli_error($con) . '</p>';
         }
         mysqli_stmt_close($stmt);
-
-        // Connect genres and tags using separate prepared statements
-        foreach ($genres as $genreId) {
-            mysqli_stmt_bind_param($genreStmt, "ii", $bookId, $genreId);
-            mysqli_stmt_execute($genreStmt);
-        }
-        foreach ($tags as $tagId) {
-            mysqli_stmt_bind_param($tagStmt, "ii", $bookId, $tagId);
-            mysqli_stmt_execute($tagStmt);
-        }
-        // ... (same logic as before)
- 
-        mysqli_stmt_close($genreStmt);
-        mysqli_stmt_close($tagStmt);
-        $success = '<p>Book created successfully! View your book <a href="OLMS_book_details_v1.php?book_id=' . $bookId . '">here</a>.</p>';
-    } else {
-        $error = '<p>Error creating book: ' . mysqli_error($con).'</p>';
     }
-    mysqli_stmt_close($stmt);
 }
+// Retrieve error message from session
+$error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
+unset($_SESSION['error']); // Clear the session error variable
+// Check for session error
 
-mysqli_close($con);}
+mysqli_close($con);
 
 ?>
 
@@ -152,17 +169,30 @@ mysqli_close($con);}
         <input type="text" class="form-control" placeholder="Enter author name" id="author" name="author" required><br>
     </div><br>
     <div class="container">
-        <label for="name" class="form-label"><p>Genre:</p></label>
-        <input type="checkbox" class="form-control" id="genres" name="genres" value="<?php foreach ($genres as $genre): ?>" required>
-            <?php echo $genre;
-            endforeach; ?>  <br>
-    </div><br>
-    <div class="container">
-        <label for="name" class="form-label"><p>Tag:</p></label>
-        <input type="checkbox" class="form-control" id="tags" name="tags" value="<?php foreach ($tags as $tag): ?>" required>
-            <?php echo $tag;
-            endforeach; ?> <br>
-    </div><br>
+    <label class="form-label"><p>Genre:</p></label>
+    <?php
+    // Fetch and populate genres dynamically
+    $genres = fetchGenresFromDatabase($con, $user_email);
+    foreach ($genres as $genre) {
+        echo "<div style='display: inline-block; margin-right: 10px;'>";
+        echo "<p><input type='checkbox' id='{$genre['genre_id']}' name='genres[]' value='{$genre['genre_id']}'><label for='{$genre['genre_id']}'>{$genre['gname']}</label></p>";
+        echo "</div>";
+    }
+    ?>
+</div><br>
+<div class="container">
+    <label class="form-label"><p>Tag:</p></label>
+    <?php
+    // Fetch and populate tags dynamically
+    $tags = fetchTagsFromDatabase($con, $user_email);
+    foreach ($tags as $tag) {
+        echo "<div style='display: inline-block; margin-right: 10px;'>";
+        echo "<p><input type='checkbox' id='{$tag['tag_id']}' name='tags[]' value='{$tag['tag_id']}'><label for='{$tag['tag_id']}'>{$tag['tname']}</label></p>";
+        echo "</div>";
+    }
+    ?>
+</div><br>
+
     <div class="container">
         <label for="name" class="form-label"><p>Number of chapters read:</p></label>
         <input type="textbox" class="form-control" placeholder="Enter number of chapters read" id="numofchaprd" name="numofchpard" value="" required>
@@ -177,7 +207,7 @@ mysqli_close($con);}
     </div><br>
     <button type="submit" class="btn btn-primary">Create book</button><br>
 </form><br>
-<a href="OLMS_my_book_v1.php" class="btn btn-primary">Back to My book</a><br><br>
+<a href="OLMS_my_book_v1.php" class="btn btn-primary">Back to My books</a><br><br>
 <footer>
     <div class="container">
         <p>2024 Online Literary Management System Website</p>
