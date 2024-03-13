@@ -1,21 +1,25 @@
 <?php
 // Start session
 session_start();
-
-// Check if user is logged in
-if (!isset($_SESSION['user_email'])) {
-    // Redirect to sign-in page if not logged in
-    header("Location: OLMS_sign_in_v3.php");
-    exit;
-}
-
-// Get user email from session
-$user_email = $_SESSION['user_email'];
-
-// Connect to the database
 $con = mysqli_connect('localhost', 'root', '', 'olms');
 if (!$con) {
     die("Database connection failed: " . mysqli_connect_error());
+}
+
+// Check if the user is logged in 
+if (isset($_SESSION['user_email'])) {
+    $user_email = $_SESSION['user_email'];
+    // Fetch user information from the database
+    $sql = "SELECT username FROM users WHERE email = ?";
+    $stmt = mysqli_prepare($con, $sql);
+    mysqli_stmt_bind_param($stmt, "s", $user_email);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_bind_result($stmt, $username);
+    mysqli_stmt_fetch($stmt);
+    mysqli_stmt_close($stmt);
+} else {
+    header("Location: OLMS_sign_in_v3.php"); // Redirect to login if not logged in
+    exit;
 }
 // Get library ID from GET parameter
 $library_id = isset($_GET['library_id']) ? $_GET['library_id'] : null;
@@ -60,28 +64,38 @@ if ($library_id) {
 <head>
     <title>My Libraries | Online Literary Management System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="style_v2.css">
+    <link rel="stylesheet" href="style_v1.css">
 </head>
 <body class="bg-dark text-light">
     <header>
         <h1>My Libraries | Online Literary Management System</h1>
-        <nav>
-            <a href="OLMS_owner_homepage_v1.php">Home</a>
-            <a href="OLMS_my_library_v1.php">My Libraries</a>
-            <a href="OLMS_my_book_v1.php">My Books</a>
-            <a href="OLMS_my_genre_v1.php">My Genres</a>
-            <a href="OLMS_my_tag_v1.php">My Tags</a>
+        <div class="topnav">
+        <a href="OLMS_owner_homepage_v1.php"><i class="fa fa-fw fa-home fa-2x"></i>Home</a>
+        <a class="active" href="OLMS_my_library_v1.php">My Libraries</a>
+        <a href="OLMS_my_book_v1.php">My Books</a>
+        <a href="OLMS_my_genre_v1.php">My Genres</a>
+        <a href="OLMS_my_tag_v1.php">My Tags</a>
+        <?php if ($username) : ?>
             <div class="dropdown">
-                <button class="dropbtn">User: <?php echo $_SESSION['username']; ?>
-                    <i class="fa fa-caret-down"></i>
+                <button class="dropbtn"><i class="fa fa-user-circle menu fa-2x"></i>
+                    <i class="fa fa-caret-down fa-2x"></i>
                 </button>
                 <div class="dropdown-content">
-                    <a href="#"><?php echo $_SESSION['username']; ?></a>
-                    <a href="#"><?php echo $_SESSION['user_email']; ?></a>
-                    <a href="log_out_v1.php">Log Out</a>
+                    <a href="#"><?php echo "Username:".$username; ?></a>
+                    <a href="#"><?php echo "Email:".$user_email; ?></a>
+                    <a href="log_out_v1.php"><i class="fa-solid fa-fw fa-right-from-bracket mr4"></i>Log Out</a>
                 </div>
             </div>
-        </nav>
+        <?php else : ?>
+            <a href="OLMS_sign_in_v3.php">Sign In</a>
+            <a href="OLMS_create_account_v2.php">Create Account</a>
+        <?php endif; ?>
+        <div class="search-container" >
+     <form action="search.php" >
+      <input type="text" placeholder="Search.." name="search"><button type="submit"><i class="fa fa-search"></i></button>
+     </form>
+  </div>
+    </div>
     </header><br>
     <h2>All Books</h2>
 <table class='table table-striped' width='100%'>

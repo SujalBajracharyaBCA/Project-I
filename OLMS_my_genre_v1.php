@@ -52,15 +52,15 @@ mysqli_close($con);
     <h1>My Genre | Online Literary Management System</h1>
     <div class="topnav">
         
-        <a href="OLMS_owner_homepage_v1.php"><i class="fa fa-fw fa-home"></i>Home</a>
-        <a href="OLMS_my_library_v1.php">My Libraries</a>
-        <a href="OLMS_my_book_v1.php">My Books</a>
-        <a class="active" href="OLMS_my_genre_v1.php">My Genres</a>
-        <a href="OLMS_my_tag_v1.php">My Tags</a>
+        <a href="OLMS_owner_homepage_v1.php"><i class="fa fa-fw fa-home fa-2x"></i>Home</a>
+        <a href="OLMS_my_library_v1.php"><i class="fa fa-align-justify fa-2x"></i>My Libraries</a>
+            <a href="OLMS_my_book_v2.php"><i class="fa fa-book fa-2x"></i>My Books</a>
+            <a class="active" href="OLMS_my_genre_v1.php"><i class="fa fa-tags fa-2x"></i>My Genres</a>
+            <a href="OLMS_my_tag_v1.php"><i class="fa fa-tag fa-2x"></i>My Tags</a>
         <?php if ($username) : ?>
             <div class="dropdown">
-                <button class="dropbtn"><i class="fa fa-user-circle menu"></i>
-                    <i class="fa fa-caret-down"></i>
+                <button class="dropbtn"><i class="fa fa-user-circle menu fa-2x"></i>
+                    <i class="fa fa-caret-down fa-2x"></i>
                 </button>
                 <div class="dropdown-content">
                     <a href="#"><?php echo "Username:".$username; ?></a>
@@ -72,6 +72,11 @@ mysqli_close($con);
             <a href="OLMS_sign_in_v3.php">Sign In</a>
             <a href="OLMS_create_account_v2.php">Create Account</a>
         <?php endif; ?>
+        <div class="search-container" >
+     <form action="search.php" >
+      <input type="text" placeholder="Search.." name="search"><button type="submit"><i class="fa fa-search"></i></button>
+     </form>
+  </div>
     </div>
         </header><br>
 
@@ -93,8 +98,8 @@ mysqli_close($con);
                         <td><p><?php echo $sno++; ?></p></td>
                         <td><p><?php echo $genre["gname"]; ?></p></td>
                         <td>
-                            <a href="edit_genre_v1.php?genre_id=<?php echo $genre["genre_id"]; ?>">Edit</a>
-                            <a href="delete_genre_v1.php?genre_id=<?php echo $genre["genre_id"]; ?>" onclick="return confirm('Are you sure you want to delete this genre?')"><i class="fa fa-trash"></i></a>
+                            <a href="edit_genre_v1.php?genre_id=<?php echo $genre["genre_id"]; ?>"><i class="fa fa-edit fa-2x"></i></a>
+                            <a href="delete_genre_v1.php?genre_id=<?php echo $genre["genre_id"]; ?>" onclick="return confirm('Are you sure you want to delete this genre?')"><i class="fa fa-trash fa-2x"></i></a>
                         </td>
                     </tr>
                 <?php endforeach; ?>

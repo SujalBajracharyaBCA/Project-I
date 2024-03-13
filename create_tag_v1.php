@@ -61,28 +61,34 @@ mysqli_close($con);
 <main>
 <header>
 <h1>Create tag | tags | Online Literary Management System</h1>
-    <nav>
-        <a href="OLMS_owner_homepage_v1.php">Home</a>
+<div class="topnav">
+        
+        <a href="OLMS_owner_homepage_v1.php"><i class="fa fa-fw fa-home fa-2x"></i>Home</a>
         <a href="OLMS_my_library_v1.php">My Libraries</a>
         <a href="OLMS_my_book_v1.php">My Books</a>
         <a href="OLMS_my_genre_v1.php">My Genres</a>
-        <a href="OLMS_my_tag_v1.php">My Tags</a>
+        <a class="active" href="OLMS_my_tag_v1.php">My Tags</a>
         <?php if ($username) : ?>
             <div class="dropdown">
-                <button class="dropbtn">User: <?php echo $username; ?>
-                    <i class="fa fa-caret-down"></i>
+                <button class="dropbtn"><i class="fa fa-user-circle menu fa-2x"></i>
+                    <i class="fa fa-caret-down fa-2x"></i>
                 </button>
                 <div class="dropdown-content">
-                    <a href="#"><?php echo $username; ?></a>
-                    <a href="#"><?php echo $user_email; ?></a>
-                    <a href="log_out_v1.php">Log Out</a>
+                    <a href="#"><?php echo "Username:".$username; ?></a>
+                    <a href="#"><?php echo "Email:".$user_email; ?></a>
+                    <a href="log_out_v1.php"><i class="fa-solid fa-fw fa-right-from-bracket mr4"></i>Log Out</a>
                 </div>
             </div>
         <?php else : ?>
             <a href="OLMS_sign_in_v3.php">Sign In</a>
             <a href="OLMS_create_account_v2.php">Create Account</a>
         <?php endif; ?>
-    </nav>
+    <div class="search-container" >
+     <form action="search.php" >
+      <input type="text" placeholder="Search.." name="search"><button type="submit"><i class="fa fa-search"></i></button>
+     </form>
+  </div>
+  </div>
     </header><br>
 
 <?php if (isset($error)): ?>
@@ -92,7 +98,7 @@ mysqli_close($con);
 <?php if (isset($success)): ?>
     <div class="alert alert-success"><?php echo $success; ?></div>
 <?php endif; ?>
-
+<h1>Create Tag</h1>
 <form method="post">
     <div class="container">
         <label for="name" class="form-label"><p>Tag Name:</p></label>

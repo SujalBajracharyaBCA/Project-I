@@ -1,28 +1,27 @@
 <?php
 session_start();
-
 // Connect to the database
 $con = mysqli_connect('localhost', 'root', '', 'olms');
 if (!$con) {
-  die("Database connection failed: " . mysqli_connect_error());
+    die("Database connection failed: " . mysqli_connect_error());
 }
 
 // Check if the user is logged in
 if (isset($_SESSION['user_email'])) {
-  $user_email = $_SESSION['user_email'];
+    $user_email = $_SESSION['user_email'];
 
-  // Fetch user information from the database
-  $sql = "SELECT username FROM users WHERE email = ?";
-  $stmt = mysqli_prepare($con, $sql);
-  mysqli_stmt_bind_param($stmt, "s", $user_email);
-  mysqli_stmt_execute($stmt);
-  mysqli_stmt_bind_result($stmt, $username);
-  mysqli_stmt_fetch($stmt);
-  mysqli_stmt_close($stmt);
+    // Fetch user information from the database
+    $sql = "SELECT username FROM users WHERE email = ?";
+    $stmt = mysqli_prepare($con, $sql);
+    mysqli_stmt_bind_param($stmt, "s", $user_email);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_bind_result($stmt, $username);
+    mysqli_stmt_fetch($stmt);
+    mysqli_stmt_close($stmt);
 } else {
-  $username = null;
+    header("Location: OLMS_sign_in_v3.php"); // Redirect to login if not logged in
+    exit;
 }
-
 // Retrieve library ID
 $libraryId = $_GET['library_id'];
 
@@ -78,32 +77,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <main>
 <header>
         <h1> Edit Library | My Libraries | Online Literary Management System</h1>
-        <nav>
-            <a href="OLMS_owner_homepage_v1.php">Home</a>
-            <a href="OLMS_my_library_v1.php">My Libraries</a>
-            <a href="OLMS_my_book_v1.php">My Books</a>
-            <a href="OLMS_my_genre_v1.php">My Genres</a>
-            <a href="OLMS_my_tag_v1.php">My Tags</a>
+        <div class="topnav">
+        
+        <a href="OLMS_owner_homepage_v1.php"><i class="fa fa-fw fa-home fa-2x"></i>Home</a>
+        <a class="active" href="OLMS_my_library_v1.php">My Libraries</a>
+        <a href="OLMS_my_book_v1.php">My Books</a>
+        <a href="OLMS_my_genre_v1.php">My Genres</a>
+        <a href="OLMS_my_tag_v1.php">My Tags</a>
+        <?php if ($username) : ?>
             <div class="dropdown">
-                <button class="dropbtn">User: <?php echo $_SESSION['username'];
-                ?>
-                    <i class="fa fa-caret-down"></i>
+                <button class="dropbtn"><i class="fa fa-user-circle menu fa-2x"></i>
+                    <i class="fa fa-caret-down fa-2x"></i>
                 </button>
                 <div class="dropdown-content">
-                    <?php
-                    if (isset($_SESSION['user_email'])) {
-                        // User is logged in, display username, email, and logout option
-                        echo '<a href="#">' . $_SESSION['username'] . '</a>';
-                        echo '<a href="#">' . $_SESSION['user_email'] . '</a>';
-                        echo '<a href="log_out_v1.php">Log Out</a>';
-                    } else {
-                        // User is not logged in, display Sign In and Create Account links
-                        echo '<a href="OLMS_sign_in_v3.php">Sign In</a>';
-                        echo '<a href="OLMS_create_account_v2.php">Create Account</a>';
-                    }
-                    ?>
+                    <a href="#"><?php echo "Username:".$username; ?></a>
+                    <a href="#"><?php echo "Email:".$user_email; ?></a>
+                    <a href="log_out_v1.php"><i class="fa-solid fa-fw fa-right-from-bracket mr4"></i>Log Out</a>
                 </div>
-    </nav>
+            </div>
+        <?php else : ?>
+            <a href="OLMS_sign_in_v3.php">Sign In</a>
+            <a href="OLMS_create_account_v2.php">Create Account</a>
+        <?php endif; ?>
+        <div class="search-container" >
+     <form action="search.php" >
+      <input type="text" placeholder="Search.." name="search"><button type="submit"><i class="fa fa-search"></i></button>
+     </form>
+  </div>
+ 
+    </div>
 </header><br>
 
   <h1>Edit Library</h1>
