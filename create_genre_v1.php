@@ -28,9 +28,6 @@ if (isset($_SESSION['user_email'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $gname = $_POST['gname'];
 
-    // Validate genre name (optional)
-    // You can add checks for length, allowed characters, or uniqueness here
-
     // Prepare SQL query using prepared statements
     $stmt = mysqli_prepare($con, "INSERT INTO genres (genre_id, gname, owner_email) VALUES (NULL, ?, ?)");
     mysqli_stmt_bind_param($stmt, "ss", $gname, $user_email);

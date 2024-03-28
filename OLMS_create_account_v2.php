@@ -25,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $_SESSION['error'] = "Invalid email format.";
     } else {
+        
         // Hash the password
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 

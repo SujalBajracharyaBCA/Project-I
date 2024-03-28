@@ -51,8 +51,9 @@ if (isset($_SESSION['user_email'])) {
   while ($bookRow = mysqli_fetch_assoc($bookResult)) {
     $books[] = $bookRow; // Append current book data to the array
   }
-
+   
   mysqli_stmt_close($bookStmt);
+  
 } else {
   header("Location: OLMS_sign_in_v3.php"); // Redirect to login if not logged in
   exit;

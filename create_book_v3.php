@@ -63,62 +63,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($bname) || empty($authorName) || empty($genres) || empty($tags)) {
         $error = '<p>Please fill in all required fields.</p>';
     } else {
-        // Prepare and execute SQL query for book creation
-        $stmt = mysqli_prepare($con, "INSERT INTO books (book_id, bname, owner_email, numofchaprd, numofchaptl, synopsis) VALUES (NULL, ?, ?, ?, ?, ?)");
-        mysqli_stmt_bind_param($stmt, "ssiis", $bname, $user_email, $numofchaprd, $numofchaptl, $synopsis);
-        if (mysqli_stmt_execute($stmt)) {
-            $bookId = mysqli_insert_id($con); // Get the newly inserted book ID
-            if (mysqli_stmt_execute($stmt)) {
-     $sql = "INSERT INTO authors (author_id,aname, owner_email) VALUES (NULL,?, ?)";
-     $stmt = mysqli_prepare($con, $sql);
-    mysqli_stmt_bind_param($stmt, "ss",$authorName, $user_email);
-    mysqli_stmt_execute($stmt);
-     mysqli_stmt_close($stmt);
-                   // Insert external URL into separate table
-                   $stmt = mysqli_prepare($con, "INSERT INTO books_urls (url, book_id, owner_email) VALUES (?, ?, ?)");
-                   mysqli_stmt_bind_param($stmt, "sis", $external_url, $bookId, $user_email);
-            if (mysqli_stmt_execute($stmt)) {
-         
-                // Associate genres and tags
-                if (!empty($_POST['genres'])) {
-                    foreach ($_POST['genres'] as $genreId) {
-                        $sql = "INSERT INTO books_genres (book_id, genre_id) VALUES (?, ?)";
-                        $stmt = mysqli_prepare($con, $sql);
-                        mysqli_stmt_bind_param($stmt, "ii", $bookId, $genreId);
-                        mysqli_stmt_execute($stmt);
-                        mysqli_stmt_close($stmt);
-                    }
-                }
-                if (!empty($_POST['tags'])) {
-                    foreach ($_POST['tags'] as $tagId) {
-                        $sql = "INSERT INTO books_tags (book_id, tag_id) VALUES (?, ?)";
-                        $stmt = mysqli_prepare($con, $sql);
-                        mysqli_stmt_bind_param($stmt, "ii", $bookId, $tagId);
-                        mysqli_stmt_execute($stmt);
-                        mysqli_stmt_close($stmt);
-                    }
-                }
+        include('insert_books.php');
+        echo $error;
+        include('insert_url.php');
+        echo $error;
+        include('insert_authors.php');
+        echo $error;
+        include('insert_genres.php');
+        echo $error;
+        include('insert_tags.php');
+        echo $error;
                 $success = '<p>Book created successfully! View your book <a href="OLMS_book_details_v1.php?book_id=' . $bookId . '">here</a>.</p>';
-            } else {
-                // ... handle error inserting external URL
-                echo "Error inserting external URL: " . mysqli_stmt_error($stmt);
-            }
-            mysqli_stmt_close($stmt);
-        } else {
-            // ... handle error inserting external URL
-            echo "Error inserting author: " . mysqli_stmt_error($stmt);
-        }
-        }
-         else {
-            // ... handle book creation error
-            echo "Error creating book: " . mysqli_stmt_error($stmt);
-        }
-        mysqli_stmt_close($stmt);
-    }
+            } 
+    
 }
 // Retrieve error message from session
-$error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
-unset($_SESSION['error']); // Clear the session error variable
+//$error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
+//unset($_SESSION['error']); // Clear the session error variable
 // Check for session error
 
 

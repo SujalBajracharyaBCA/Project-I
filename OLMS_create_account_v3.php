@@ -146,9 +146,6 @@ unset($_SESSION['errors']);
                 event.preventDefault(); // Prevent form submission
                 document.querySelector(".error-message").innerHTML = "Email is required.";
             }
-            // More validation logic as needed (e.g., username length, password complexity)
-
-            // If validation passes (or after extended validation), allow form submission
         });
     </script>
     <script src="bootstrap-5.2.3-dist\js\bootstrap.bundle.js"></script>
